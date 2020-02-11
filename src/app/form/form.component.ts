@@ -2,11 +2,10 @@ import { UserService } from './../user.service';
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import * as areaCode from '../../data/areaCode.json';
 import * as countryCode from '../../data/countryCode.json';
-import { FormGroup, FormControl } from '@angular/forms';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { MatSelectChange } from '@angular/material/select';
 import { Observable } from 'rxjs';
-// import { saveAs } from 'file-saver';
-
+import { User } from '../user.model';
 
 @Component({
   selector: 'app-form',
@@ -30,9 +29,9 @@ export class FormComponent implements OnInit {
     this.filteredArea = this.areaCodeData.filter(el => el.id === defaultId);
 
     this.regForm = new FormGroup({
-      lastName: new FormControl(''),
-      middleName: new FormControl(''),
-      firstName: new FormControl(''),
+      lastName: new FormControl('', [Validators.required, Validators.pattern('[a-zA-Z ]*')]),
+      middleName: new FormControl('', Validators.pattern('[a-zA-Z ]*')),
+      firstName: new FormControl('', [Validators.required, Validators.pattern('[a-zA-Z ]*')]),
       country: new FormControl(''),
       area: new FormControl(''),
       numberPhone: new FormControl(''),
@@ -46,10 +45,9 @@ export class FormComponent implements OnInit {
     console.log(this.filteredArea);
   }
 
-
   onSubmit() {
     const { lastName, middleName, firstName, area, numberPhone, gender } = this.regForm.value;
-    const fullName = `${lastName} ${middleName} ${firstName}`;
+    const fullName = `${lastName.trim()} ${middleName.trim()} ${firstName.trim()}`;
     const nbPhone: string = area + numberPhone;
     const user = {
       fullName,
@@ -57,7 +55,15 @@ export class FormComponent implements OnInit {
       gender
     };
 
-    this.userService.addUser(user);
+    this.userService.addUser(user).subscribe((userRes: User) => {
+      console.log(`Added user ${userRes.fullName}!`);
+      this.userService.getUsers();
+    });
   }
 
+  forbiddenEmails(control: FormControl) {
+    if (control.value) {
+
+    }
+  }
 }

@@ -3,16 +3,34 @@
     <mat-form-field appearance="fill" class="mr-4">
       <mat-label>Last Name</mat-label>
       <input matInput formControlName="lastName">
+      <!-- validation -->
+      <mat-error *ngIf="regForm.get('lastName').errors['pattern']">
+        Last name does not contain special characters and number
+      </mat-error>
+      <mat-error *ngIf="regForm.get('lastName').errors['required']">
+        Last name is <strong>required</strong>
+      </mat-error>
     </mat-form-field>
 
     <mat-form-field appearance="fill" class="mr-4">
       <mat-label>Middle Name</mat-label>
       <input matInput formControlName="middleName">
+      <!-- validation -->
+      <!-- <mat-error *ngIf="regForm.get('middleName').errors['pattern']">
+        Middle name does not contain special characters and number
+      </mat-error> -->
     </mat-form-field>
 
     <mat-form-field appearance="fill" class="mr-4">
       <mat-label>First Name</mat-label>
       <input matInput formControlName="firstName">
+
+      <mat-error *ngIf="regForm.get('firstName').errors['pattern']">
+        First name does not contain special characters and number
+      </mat-error>
+      <mat-error *ngIf="regForm.get('firstName').errors['required']">
+        First name is <strong>required</strong>
+      </mat-error>
     </mat-form-field>
   </div>
 

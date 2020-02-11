@@ -16,6 +16,7 @@ export class TableComponent implements OnInit, OnDestroy {
   constructor(private userService: UserService) { }
 
   ngOnInit() {
+    this.userService.getUsers();
     this.subscription = this.userService.userChanged.subscribe((users: User[]) => {
       this.users = users;
     });

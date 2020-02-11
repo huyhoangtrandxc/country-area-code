@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Subject } from 'rxjs';
 
 import { User } from './user.model';
@@ -9,15 +10,24 @@ import { User } from './user.model';
 export class UserService {
   userChanged = new Subject<User[]>();
 
-  constructor() { }
+  private users: User[];
 
-  addUser(user: User) {
-    // const newId = this.users.length + 1;
+  constructor(private http: HttpClient) { }
 
-    // this.users.push({ ...user, id: newId });
-    // const blob = new Blob([JSON.stringify({ ...user, id: newId })], { type: 'application/json' });
+  getUsers() {
+    this.http.get('https://5e4138942001b900146ba398.mockapi.io/users').subscribe((users: User[]) => {
+      this.users = users;
+      this.userChanged.next(this.users);
+    });
 
-    // this.userChanged.next(this.users.slice());
   }
 
+  addUser(user: User) {
+    const newId = this.users.length + 1;
+
+    return this.http.post('https://5e4138942001b900146ba398.mockapi.io/users', {
+      ...user,
+      id: newId
+    });
+  }
 }

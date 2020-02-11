@@ -1,4 +1,4 @@
-<table mat-table [dataSource]="user" class="mat-elevation-z8">
+<table mat-table [dataSource]="users" class="mat-elevation-z8">
 
   <!--- Note that these columns can be defined in any order.
           The actual rendered columns are set as a property on the row definition" -->
@@ -6,19 +6,19 @@
   <!-- Name Column -->
   <ng-container matColumnDef="name">
     <th mat-header-cell *matHeaderCellDef> Name </th>
-    <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+    <td mat-cell *matCellDef="let element"> {{element.fullName}} </td>
   </ng-container>
 
   <!-- Weight Column -->
   <ng-container matColumnDef="phone">
     <th mat-header-cell *matHeaderCellDef> Number Phone </th>
-    <td mat-cell *matCellDef="let element"> {{element.phone}} </td>
+    <td mat-cell *matCellDef="let element"> {{element.nbPhone}} </td>
   </ng-container>
 
   <!-- Symbol Column -->
   <ng-container matColumnDef="gender">
     <th mat-header-cell *matHeaderCellDef> Gender </th>
-    <td mat-cell *matCellDef="let element"> {{element.gender}} </td>
+    <td mat-cell *matCellDef="let element"> {{element.gender == "M" ? "Male" : "Female" }} </td>
   </ng-container>
 
   <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
