@@ -16,13 +16,17 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatTableModule } from '@angular/material/table';
 import { HttpClientModule } from '@angular/common/http';
+import { BlockCopyPasteDirective } from './block-copy-paste.directive';
+
 
 
 @NgModule({
   declarations: [
     AppComponent,
     FormComponent,
-    TableComponent
+    TableComponent,
+    BlockCopyPasteDirective,
+
   ],
   imports: [
     BrowserModule,

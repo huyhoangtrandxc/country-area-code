@@ -4,31 +4,32 @@
       <mat-label>Last Name</mat-label>
       <input matInput formControlName="lastName">
       <!-- validation -->
-      <mat-error *ngIf="regForm.get('lastName').errors['pattern']">
-        Last name does not contain special characters and number
+      <mat-error *ngIf=" !regForm.get('lastName').valid &&  regForm.get('lastName').errors['pattern']">
+        Last name does not contain special characters
       </mat-error>
-      <mat-error *ngIf="regForm.get('lastName').errors['required']">
+      <mat-error *ngIf=" !regForm.get('lastName').valid && regForm.get('lastName').errors['required']">
         Last name is <strong>required</strong>
       </mat-error>
+
     </mat-form-field>
 
     <mat-form-field appearance="fill" class="mr-4">
       <mat-label>Middle Name</mat-label>
       <input matInput formControlName="middleName">
       <!-- validation -->
-      <!-- <mat-error *ngIf="regForm.get('middleName').errors['pattern']">
-        Middle name does not contain special characters and number
-      </mat-error> -->
+      <mat-error *ngIf="!regForm.get('middleName').valid && regForm.get('middleName').errors['pattern']">
+        Middle name does not contain special characters
+      </mat-error>
     </mat-form-field>
 
     <mat-form-field appearance="fill" class="mr-4">
       <mat-label>First Name</mat-label>
       <input matInput formControlName="firstName">
 
-      <mat-error *ngIf="regForm.get('firstName').errors['pattern']">
-        First name does not contain special characters and number
+      <mat-error *ngIf="!regForm.get('firstName').valid && regForm.get('firstName').errors['pattern']">
+        First name does not contain special characters
       </mat-error>
-      <mat-error *ngIf="regForm.get('firstName').errors['required']">
+      <mat-error *ngIf="!regForm.get('firstName').valid && regForm.get('firstName').errors['required']">
         First name is <strong>required</strong>
       </mat-error>
     </mat-form-field>
@@ -36,7 +37,7 @@
 
 
   <!-- CODE OPTION -->
-  <div class="d-flex justify-content-center ml-3">
+  <div class="d-flex justify-content-center ml-3 mt-4">
     <mat-form-field class="mr-5">
       <mat-label>Country Code</mat-label>
       <mat-select formControlName="country" (selectionChange)="changeCountry($event)">
@@ -57,7 +58,10 @@
 
     <mat-form-field appearance="legacy" class="mr-5">
       <mat-label>Number phone</mat-label>
-      <input matInput placeholder="Number phone" formControlName="numberPhone">
+      <input appBlockCopyPaste matInput placeholder="Number phone" formControlName="numberPhone">
+      <mat-error *ngIf="!regForm.get('numberPhone').valid && regForm.get('numberPhone').errors['pattern']">
+        Number phone only accept number
+      </mat-error>
     </mat-form-field>
   </div>
 
@@ -67,11 +71,16 @@
     <mat-radio-group aria-label="Select an option" class="mt-1" formControlName="gender">
       <mat-radio-button value="F">Female</mat-radio-button>
       <mat-radio-button value="M">Male</mat-radio-button>
+      <mat-error *ngIf="submitted && ( regForm.get('gender').value === 'U' )">
+        Please enter your gender
+      </mat-error>
     </mat-radio-group>
   </div>
 
   <div class="mt-4 ml-3">
     <button mat-flat-button color="primary" type="submit">Submit</button>
+
+    <button mat-flat-button color="accent" class="ml-4" type="button">Retrieve My Info</button>
   </div>
 
 </form>

@@ -18,6 +18,7 @@ export class FormComponent implements OnInit {
   areaCodeData: any;
   countryCodeData: any;
   filteredArea: Observable<any>;
+  submitted = false;
 
   constructor(private userService: UserService) { }
 
@@ -29,13 +30,13 @@ export class FormComponent implements OnInit {
     this.filteredArea = this.areaCodeData.filter(el => el.id === defaultId);
 
     this.regForm = new FormGroup({
-      lastName: new FormControl('', [Validators.required, Validators.pattern('[a-zA-Z ]*')]),
-      middleName: new FormControl('', Validators.pattern('[a-zA-Z ]*')),
-      firstName: new FormControl('', [Validators.required, Validators.pattern('[a-zA-Z ]*')]),
+      lastName: new FormControl('', [Validators.required, Validators.pattern(/^[^*|:<>[\]{}.,?/`~¥£€\\';@&$!#%^*+=()”]+$/)]),
+      middleName: new FormControl('', [Validators.pattern(/^[^*|:<>[\]{}.,?/`~¥£€\\';@&$!#%^*+=()”]+$/)]),
+      firstName: new FormControl('', [Validators.required, Validators.pattern(/^[^*|:<>[\]{}.,?/`~¥£€\\';@&$!#%^*+=()”]+$/)]),
       country: new FormControl(''),
       area: new FormControl(''),
-      numberPhone: new FormControl(''),
-      gender: new FormControl('U')
+      numberPhone: new FormControl('', [Validators.pattern(/^(\(?\+?[0-9]*\)?)?[0-9_\- \(\)]*$/)]),
+      gender: new FormControl('U', [this.forbiddenGender])
     });
   }
 
@@ -46,6 +47,8 @@ export class FormComponent implements OnInit {
   }
 
   onSubmit() {
+    this.submitted = true;
+
     const { lastName, middleName, firstName, area, numberPhone, gender } = this.regForm.value;
     const fullName = `${lastName.trim()} ${middleName.trim()} ${firstName.trim()}`;
     const nbPhone: string = area + numberPhone;
@@ -60,10 +63,20 @@ export class FormComponent implements OnInit {
       this.userService.getUsers();
     });
   }
+  // /^[^*|:<>[\]{}.,?/`~¥£€\\';@&$!#%^*+=()”]+$/
+  forbiddenMiddleName(control: FormControl) {
+    const myRegex = /^[^*|:<>[\]{}.,?/`~¥£€\\';@&$!#%^*+=()”]+$/;
 
-  forbiddenEmails(control: FormControl) {
-    if (control.value) {
-
+    if (myRegex.test(control.value)) {
+      return null;
     }
+    return { middleNameIsForbidden: true };
+  }
+
+  forbiddenGender(control: FormControl) {
+    if (control.value === 'U') {
+      return { genderEqual: true };
+    }
+    return null;
   }
 }
