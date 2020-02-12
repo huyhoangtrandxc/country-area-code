@@ -21,18 +21,24 @@ export class FormComponent implements OnInit {
   info: any;
 
   regForm: FormGroup;
-  filteredArea: Observable<any>;
+  filteredArea = [];
   submitted = false;
+
+  // arrayCountryCode: string[];
 
   constructor(private userService: UserService) { }
 
   ngOnInit() {
+    // data get from JSON
     this.areaCodeData = (areaCode as any).default;
     this.countryCodeData = (countryCode as any).default;
     this.info = (info as any).default;
 
-    const defaultId = 1;
-    this.filteredArea = this.areaCodeData.filter(el => el.id === defaultId);
+    // const defaultId = 1;
+    // this.filteredArea = this.areaCodeData.find(el => el.id === defaultId);
+
+    // map array code
+    // this.arrayCountryCode = this.countryCodeData.map(el => el.value);
 
     this.regForm = new FormGroup({
       lastName: new FormControl('', [
@@ -56,7 +62,7 @@ export class FormComponent implements OnInit {
 
   changeCountry(e) {
     const id = e.value;
-    this.filteredArea = this.areaCodeData.filter(el => el.id === id);
+    this.filteredArea = this.areaCodeData.find(el => el.id === id);
     console.log(this.filteredArea);
   }
 
@@ -96,16 +102,30 @@ export class FormComponent implements OnInit {
 
   setInfo() {
     const { fullName, lastName, middleName, phoneNumber, gender } = this.info;
-    const firstName = fullName.split(' ')[0];
-    const country = phoneNumber.slice(0, 3);
-    const numberPhone = phoneNumber.slice(3);
 
+    const firstName = fullName.split(' ').reverse()[0];
+    const country = this.countryCodeData.find(el => phoneNumber.includes(el.value));
+    const bnPhoneWithoutCoutry = phoneNumber.slice(country.value.length);
+    const ftAreaThreeNb = this.areaCodeData.find(el => el.id === country.id).value
+      .find(el => el.slice(1) === bnPhoneWithoutCoutry.slice(0, 2));
+    const ftAreaFourNb = this.areaCodeData.find(el => el.id === country.id).value
+      .find(el => el.slice(1) === bnPhoneWithoutCoutry.slice(0, 3));
+
+    let bnPhoneWithoutCAndA: string;
+    if (ftAreaThreeNb) {
+      bnPhoneWithoutCAndA = bnPhoneWithoutCoutry.slice(2);
+    } else if (ftAreaFourNb) {
+      bnPhoneWithoutCAndA = bnPhoneWithoutCoutry.slice(3);
+    }
+
+    this.filteredArea = this.areaCodeData.find(el => el.id === country.id);
     this.regForm.patchValue({
       lastName,
       middleName,
       firstName,
-      country,
-      numberPhone,
+      country: country.id,
+      area: ftAreaThreeNb || ftAreaFourNb,
+      numberPhone: bnPhoneWithoutCAndA,
       gender
     });
   }
