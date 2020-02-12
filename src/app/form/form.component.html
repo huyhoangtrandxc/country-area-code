@@ -38,7 +38,6 @@
     </mat-form-field>
   </div>
 
-
   <!-- CODE OPTION -->
   <div class="d-flex justify-content-center ml-3 mt-4">
     <mat-form-field class="mr-5">
@@ -80,8 +79,13 @@
     </mat-radio-group>
   </div>
 
-  <div class="mt-4 ml-3">
+  <div class="mt-4 ml-3" *ngIf="!isEdit">
     <button mat-flat-button color="primary" type="submit">Submit</button>
     <button mat-flat-button color="accent" class="ml-4" type="button" (click)='setInfo()'>Retrieve My Info</button>
+  </div>
+
+  <div class="mt-4 ml-3" *ngIf="isEdit">
+    <button id="edit-btn" mat-flat-button color="primary" type="button" (click)="onEdit()">Edit</button>
+    <ng-content></ng-content>
   </div>
 </form>

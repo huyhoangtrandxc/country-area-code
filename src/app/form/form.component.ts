@@ -1,12 +1,11 @@
-import { UserService } from './../user.service';
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { MatSelectChange } from '@angular/material/select';
+
 import * as areaCode from '../../data/areaCode.json';
 import * as countryCode from '../../data/countryCode.json';
 import * as info from '../../data/info.json';
-
-import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { MatSelectChange } from '@angular/material/select';
-import { Observable } from 'rxjs';
+import { UserService } from './../user.service';
 import { User } from '../user.model';
 
 @Component({
@@ -16,6 +15,7 @@ import { User } from '../user.model';
 })
 export class FormComponent implements OnInit {
   @Output() selectionChange: EventEmitter<MatSelectChange>;
+  @Input() isEdit: boolean;
   areaCodeData: any;
   countryCodeData: any;
   info: any;
@@ -24,9 +24,9 @@ export class FormComponent implements OnInit {
   filteredArea = [];
   submitted = false;
 
-  // arrayCountryCode: string[];
-
-  constructor(private userService: UserService) { }
+  constructor(
+    private userService: UserService,
+  ) { }
 
   ngOnInit() {
     // data get from JSON
@@ -34,27 +34,21 @@ export class FormComponent implements OnInit {
     this.countryCodeData = (countryCode as any).default;
     this.info = (info as any).default;
 
-    // const defaultId = 1;
-    // this.filteredArea = this.areaCodeData.find(el => el.id === defaultId);
-
-    // map array code
-    // this.arrayCountryCode = this.countryCodeData.map(el => el.value);
-
     this.regForm = new FormGroup({
-      lastName: new FormControl('', [
+      lastName: new FormControl(null, [
         Validators.required,
         Validators.pattern(/^[^*|:<>[\]{}.,?/`~¥£€\\';@&$!#%^*+=()”]+$/),
         this.forbiddenNotAllowedNumber
       ]),
       middleName: new FormControl('', [Validators.pattern(/^[^*|:<>[\]{}.,?/`~¥£€\\';@&$!#%^*+=()”]+$/)]),
-      firstName: new FormControl('', [
+      firstName: new FormControl(null, [
         Validators.required,
         Validators.pattern(/^[^*|:<>[\]{}.,?/`~¥£€\\';@&$!#%^*+=()”]+$/),
         this.forbiddenNotAllowedNumber
       ]),
 
-      country: new FormControl(''),
-      area: new FormControl(''),
+      country: new FormControl(null),
+      area: new FormControl(null),
       numberPhone: new FormControl('', [Validators.pattern(/^(\(?\+?[0-9]*\)?)?[0-9_\- \(\)]*$/)]),
       gender: new FormControl('U', [this.forbiddenGender])
     });
@@ -69,19 +63,24 @@ export class FormComponent implements OnInit {
   onSubmit() {
     this.submitted = true;
 
+    let fullName: string;
     const { lastName, middleName, firstName, area, numberPhone, gender } = this.regForm.value;
-    const fullName = `${lastName.trim()} ${middleName.trim()} ${firstName.trim()}`;
     const nbPhone: string = area + numberPhone;
+    if (lastName && firstName) {
+      fullName = `${lastName.trim()} ${middleName.trim()} ${firstName.trim()}`;
+    }
     const user = {
       fullName,
       nbPhone,
       gender
     };
 
-    this.userService.addUser(user).subscribe((userRes: User) => {
-      console.log(`Added user ${userRes.fullName}!`);
-      this.userService.getUsers();
-    });
+    if (this.regForm.valid) {
+      this.userService.addUser(user).subscribe((userRes: User) => {
+        console.log(`Added user ${userRes.fullName}!`);
+        this.userService.getUsers();
+      });
+    }
   }
 
   forbiddenGender(control: FormControl) {
@@ -129,4 +128,8 @@ export class FormComponent implements OnInit {
       gender
     });
   }
+
+  // onEdit(){
+
+  // }
 }
