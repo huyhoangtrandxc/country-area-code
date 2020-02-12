@@ -1,0 +1,46 @@
+Create a form included 5 fields (using reactive form ) :
+1.	Last Name
+2.	Middle Name
+3.	First Name
+4.	Country Code 
+a.	Create a json file of Country Code object
+b.	Object contain AreaCode and CountryCode
+c.	Create at least 10 Country code object in json file
+d.	Display AreaCode and get value by CountryCode.
+5.	Phone Number (max length 20 chars)
+6.	Gender (default not choosing anything)
+
+Requirement 1 :
+Create a custom validator for those fields :
+-	Last Name :
+o	Required
+o	Not using special characters and number
+-	Middle Name :
+o	Not using special characters and number
+-	First Name :
+o	Required
+o	Not using special characters and number
+-	Phone Number
+o	Accept number only (prevent copy and paste string into this field)
+o	Cannot input special characters 
+-	Gender (value ‘F’ for Female, ‘M’ for male) (radio button)
+o	Required
+*Bonus : create a  special validator for 3 field (Last Name, Middle Name, First Name) trigger when total of characters contains in this three fields exceed 40 characters
+Requirement 2
+Create a button Retrieve My info
+1.	Create a json object contain a full item of form contains :
+a.	FullName
+b.	LastName
+c.	MiddleName
+d.	PhoneNumber
+e.	Gender
+
+
+2.	When click on button Retrieve My Info, auto map value into reactive form :
+a.	Scenario 1 : 
+i.	When gender value is ‘U’, uncheck radion button of Gender
+ii.	Json of Retrieve My Info only have Last Name and First Name, not contain Middle Name
+iii.	Create a label field ‘Full Name’ contain FullName from returned json
+iv.	Can move name between LastName, MiddleName and FirstName but is must be consistence with Full Name like example below
+1.	FullName is ‘Nguyen Van A’, word ‘Nguyen’, ‘Van’, ‘A’ can be move everywhere in 3 fields LastName, MiddleName and FirstName, but when a difference words discovered, there will be and error display “Incorrect Full Name”
+

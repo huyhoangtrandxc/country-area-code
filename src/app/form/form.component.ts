@@ -2,6 +2,8 @@ import { UserService } from './../user.service';
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import * as areaCode from '../../data/areaCode.json';
 import * as countryCode from '../../data/countryCode.json';
+import * as info from '../../data/info.json';
+
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { MatSelectChange } from '@angular/material/select';
 import { Observable } from 'rxjs';
@@ -14,9 +16,11 @@ import { User } from '../user.model';
 })
 export class FormComponent implements OnInit {
   @Output() selectionChange: EventEmitter<MatSelectChange>;
-  regForm: FormGroup;
   areaCodeData: any;
   countryCodeData: any;
+  info: any;
+
+  regForm: FormGroup;
   filteredArea: Observable<any>;
   submitted = false;
 
@@ -25,6 +29,7 @@ export class FormComponent implements OnInit {
   ngOnInit() {
     this.areaCodeData = (areaCode as any).default;
     this.countryCodeData = (countryCode as any).default;
+    this.info = (info as any).default;
 
     const defaultId = 1;
     this.filteredArea = this.areaCodeData.filter(el => el.id === defaultId);
@@ -63,20 +68,27 @@ export class FormComponent implements OnInit {
       this.userService.getUsers();
     });
   }
-  // /^[^*|:<>[\]{}.,?/`~¥£€\\';@&$!#%^*+=()”]+$/
-  forbiddenMiddleName(control: FormControl) {
-    const myRegex = /^[^*|:<>[\]{}.,?/`~¥£€\\';@&$!#%^*+=()”]+$/;
-
-    if (myRegex.test(control.value)) {
-      return null;
-    }
-    return { middleNameIsForbidden: true };
-  }
 
   forbiddenGender(control: FormControl) {
     if (control.value === 'U') {
       return { genderEqual: true };
     }
     return null;
+  }
+
+  setInfo() {
+    const { fullName, lastName, middleName, phoneNumber, gender } = this.info;
+    const firstName = fullName.split(' ')[0];
+    const country = phoneNumber.slice(0, 3);
+    const numberPhone = phoneNumber.slice(3);
+
+    this.regForm.patchValue({
+      lastName,
+      middleName,
+      firstName,
+      country,
+      numberPhone,
+      gender
+    });
   }
 }
