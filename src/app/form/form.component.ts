@@ -35,9 +35,18 @@ export class FormComponent implements OnInit {
     this.filteredArea = this.areaCodeData.filter(el => el.id === defaultId);
 
     this.regForm = new FormGroup({
-      lastName: new FormControl('', [Validators.required, Validators.pattern(/^[^*|:<>[\]{}.,?/`~¥£€\\';@&$!#%^*+=()”]+$/)]),
+      lastName: new FormControl('', [
+        Validators.required,
+        Validators.pattern(/^[^*|:<>[\]{}.,?/`~¥£€\\';@&$!#%^*+=()”]+$/),
+        this.forbiddenNotAllowedNumber
+      ]),
       middleName: new FormControl('', [Validators.pattern(/^[^*|:<>[\]{}.,?/`~¥£€\\';@&$!#%^*+=()”]+$/)]),
-      firstName: new FormControl('', [Validators.required, Validators.pattern(/^[^*|:<>[\]{}.,?/`~¥£€\\';@&$!#%^*+=()”]+$/)]),
+      firstName: new FormControl('', [
+        Validators.required,
+        Validators.pattern(/^[^*|:<>[\]{}.,?/`~¥£€\\';@&$!#%^*+=()”]+$/),
+        this.forbiddenNotAllowedNumber
+      ]),
+
       country: new FormControl(''),
       area: new FormControl(''),
       numberPhone: new FormControl('', [Validators.pattern(/^(\(?\+?[0-9]*\)?)?[0-9_\- \(\)]*$/)]),
@@ -72,6 +81,15 @@ export class FormComponent implements OnInit {
   forbiddenGender(control: FormControl) {
     if (control.value === 'U') {
       return { genderEqual: true };
+    }
+    return null;
+  }
+
+  forbiddenNotAllowedNumber(control: FormControl) {
+    const myPatternNotAllowedNumber = /^([^0-9]*)$/;
+
+    if (!myPatternNotAllowedNumber.test(control.value)) {
+      return { hasNumber: true };
     }
     return null;
   }

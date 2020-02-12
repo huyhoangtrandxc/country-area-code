@@ -4,13 +4,14 @@
       <mat-label>Last Name</mat-label>
       <input matInput formControlName="lastName">
       <!-- validation -->
-      <mat-error *ngIf=" !regForm.get('lastName').valid &&  regForm.get('lastName').errors['pattern']">
-        Last name does not contain special characters
-      </mat-error>
       <mat-error *ngIf=" !regForm.get('lastName').valid && regForm.get('lastName').errors['required']">
         Last name is <strong>required</strong>
       </mat-error>
 
+      <mat-error *ngIf=" !regForm.get('lastName').valid 
+      && (regForm.get('lastName').errors['pattern'] || regForm.get('lastName').errors['hasNumber'])">
+        Last name only accept <strong>string</strong>
+      </mat-error>
     </mat-form-field>
 
     <mat-form-field appearance="fill" class="mr-4">
@@ -26,11 +27,13 @@
       <mat-label>First Name</mat-label>
       <input matInput formControlName="firstName">
 
-      <mat-error *ngIf="!regForm.get('firstName').valid && regForm.get('firstName').errors['pattern']">
-        First name does not contain special characters
-      </mat-error>
       <mat-error *ngIf="!regForm.get('firstName').valid && regForm.get('firstName').errors['required']">
         First name is <strong>required</strong>
+      </mat-error>
+
+      <mat-error *ngIf=" !regForm.get('firstName').valid 
+      && (regForm.get('firstName').errors['pattern'] || regForm.get('firstName').errors['hasNumber'])">
+        Last name only accepts <strong>string</strong>
       </mat-error>
     </mat-form-field>
   </div>
@@ -81,5 +84,4 @@
     <button mat-flat-button color="primary" type="submit">Submit</button>
     <button mat-flat-button color="accent" class="ml-4" type="button" (click)='setInfo()'>Retrieve My Info</button>
   </div>
-
 </form>
