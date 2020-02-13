@@ -16,23 +16,27 @@ import { User } from '../user.model';
 export class FormComponent implements OnInit {
   @Output() selectionChange: EventEmitter<MatSelectChange>;
   @Input() isEdit: boolean;
+  @Input() userEdit: any;
   areaCodeData: any;
   countryCodeData: any;
   info: any;
 
   regForm: FormGroup;
-  filteredArea = [];
+  filteredArea: any;
   submitted = false;
+  areaEdit: string;
 
   constructor(
     private userService: UserService,
   ) { }
 
   ngOnInit() {
+
     // data get from JSON
     this.areaCodeData = (areaCode as any).default;
     this.countryCodeData = (countryCode as any).default;
     this.info = (info as any).default;
+    this.filteredArea = this.areaCodeData.find(el => el.id === 1);
 
     this.regForm = new FormGroup({
       lastName: new FormControl(null, [
@@ -49,9 +53,14 @@ export class FormComponent implements OnInit {
 
       country: new FormControl(null),
       area: new FormControl(null),
+      areaEdit: new FormControl(null),
       numberPhone: new FormControl('', [Validators.pattern(/^(\(?\+?[0-9]*\)?)?[0-9_\- \(\)]*$/)]),
       gender: new FormControl('U', [this.forbiddenGender])
     });
+
+    if (this.userEdit && this.isEdit) {
+      this.setInfoEdit(this.userEdit);
+    }
   }
 
   changeCountry(e) {
@@ -102,20 +111,10 @@ export class FormComponent implements OnInit {
   setInfo() {
     const { fullName, lastName, middleName, phoneNumber, gender } = this.info;
 
+    const country = this.getCountry(phoneNumber);
     const firstName = fullName.split(' ').reverse()[0];
-    const country = this.countryCodeData.find(el => phoneNumber.includes(el.value));
-    const bnPhoneWithoutCoutry = phoneNumber.slice(country.value.length);
-    const ftAreaThreeNb = this.areaCodeData.find(el => el.id === country.id).value
-      .find(el => el.slice(1) === bnPhoneWithoutCoutry.slice(0, 2));
-    const ftAreaFourNb = this.areaCodeData.find(el => el.id === country.id).value
-      .find(el => el.slice(1) === bnPhoneWithoutCoutry.slice(0, 3));
-
-    let bnPhoneWithoutCAndA: string;
-    if (ftAreaThreeNb) {
-      bnPhoneWithoutCAndA = bnPhoneWithoutCoutry.slice(2);
-    } else if (ftAreaFourNb) {
-      bnPhoneWithoutCAndA = bnPhoneWithoutCoutry.slice(3);
-    }
+    const areaC = this.getAreaCode(country, phoneNumber);
+    const numberPhoneOnly = this.getShortNbPhone(country, areaC, phoneNumber);
 
     this.filteredArea = this.areaCodeData.find(el => el.id === country.id);
     this.regForm.patchValue({
@@ -123,13 +122,50 @@ export class FormComponent implements OnInit {
       middleName,
       firstName,
       country: country.id,
-      area: ftAreaThreeNb || ftAreaFourNb,
-      numberPhone: bnPhoneWithoutCAndA,
+      area: areaC,
+      numberPhone: numberPhoneOnly,
       gender
     });
   }
 
-  // onEdit(){
+  setInfoEdit(user: any) {
+    this.filteredArea = this.areaCodeData.find(el => el.id === 1);
 
-  // }
+    const { fullName, nbPhone, gender } = user;
+    const arrName = fullName.split(' ');
+    const areaC = this.filteredArea.value.find(el => nbPhone.indexOf(el) === 0);
+    this.areaEdit = '13321';
+
+    this.regForm.patchValue({
+      lastName: arrName[0],
+      middleName: arrName[1],
+      firstName: arrName[2],
+      areaEdit: areaC,
+      numberPhone: nbPhone,
+      gender
+    });
+  }
+
+  // return string nb phone without country code (+84)
+  getAreaCode(country: any, phoneNumber: string) {
+    const bnPhoneWithoutCoutry = phoneNumber.slice(country.value.length);
+    const ftAreaThreeNb = this.areaCodeData.find(el => el.id === country.id).value
+      .find(el => el.slice(1) === bnPhoneWithoutCoutry.slice(0, 2));
+    const ftAreaFourNb = this.areaCodeData.find(el => el.id === country.id).value
+      .find(el => el.slice(1) === bnPhoneWithoutCoutry.slice(0, 3));
+
+    return ftAreaThreeNb || ftAreaFourNb;
+  }
+
+  getShortNbPhone(country: any, areaC: string, numberPhone: string) {
+    return numberPhone.slice((country.value + areaC).length - 1);
+  }
+
+  getCountry(phoneNumber: string) {
+    return this.countryCodeData.find(el => phoneNumber.includes(el.value));
+  }
+
+  get ftAreaValue() {
+    return this.filteredArea.value || [];
+  }
 }

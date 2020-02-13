@@ -22,7 +22,7 @@ export class UserService {
   }
 
   getUser(id: string) {
-    return this.http.get('https://5e4138942001b900146ba398.mockapi.io/users/' + id)
+    return this.http.get('https://5e4138942001b900146ba398.mockapi.io/users/' + id);
   }
 
   addUser(user: User) {

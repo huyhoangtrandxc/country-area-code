@@ -40,7 +40,7 @@
 
   <!-- CODE OPTION -->
   <div class="d-flex justify-content-center ml-3 mt-4">
-    <mat-form-field class="mr-5">
+    <mat-form-field class="mr-5" *ngIf="!isEdit">
       <mat-label>Country Code</mat-label>
       <mat-select matNativeControl formControlName="country" (selectionChange)="changeCountry($event)">
         <mat-option *ngFor="let country of countryCodeData" [value]="country.id">
@@ -49,11 +49,20 @@
       </mat-select>
     </mat-form-field>
 
-    <mat-form-field class="mr-5">
+    <mat-form-field class="mr-5" *ngIf="!isEdit">
       <mat-label>Area Code</mat-label>
       <mat-select formControlName="area">
         <mat-option *ngFor="let area of filteredArea.value" [value]="area">
           {{area}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field class="mr-5" *ngIf="isEdit">
+      <mat-label>Area Code</mat-label>
+      <mat-select formControlName="areaEdit">
+        <mat-option *ngFor="let areaEdit of filteredArea.value" [value]="areaEdit">
+          {{ areaEdit }}
         </mat-option>
       </mat-select>
     </mat-form-field>
@@ -85,7 +94,7 @@
   </div>
 
   <div class="mt-4 ml-3" *ngIf="isEdit">
-    <button id="edit-btn" mat-flat-button color="primary" type="button" (click)="onEdit()">Edit</button>
+    <button id="edit-btn" mat-flat-button color="primary" type="button" (click)="onEdit()"> Save </button>
     <ng-content></ng-content>
   </div>
 </form>

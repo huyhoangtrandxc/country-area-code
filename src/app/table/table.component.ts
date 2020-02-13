@@ -29,23 +29,22 @@ export class TableComponent implements OnInit, OnDestroy {
   }
 
   openDialog(id: string): void {
-    this.getUser(id);
-
-    const dialogRef = this.dialog.open(DialogComponent, {
-      width: '750px',
-      data: this.user
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
-      this.user = result;
-    });
-  }
-
-  getUser(id: string) {
     this.userService.getUser(id).subscribe((user: User) => {
       this.user = user;
+
+      const dialogRef = this.dialog.open(DialogComponent, {
+        width: '750px',
+        data: {
+          user: this.user
+        }
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+        console.log('The dialog was closed');
+        this.user = result;
+      });
     });
+
   }
 
   ngOnDestroy() {
