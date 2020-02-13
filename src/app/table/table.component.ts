@@ -12,8 +12,8 @@ import { DialogComponent } from '../dialog/dialog.component';
 })
 export class TableComponent implements OnInit, OnDestroy {
   subscription: Subscription;
-  users: User[];
   user: User;
+  users: User[];
   displayedColumns: string[] = ['name', 'phone', 'gender', '#'];
 
   constructor(
@@ -29,6 +29,7 @@ export class TableComponent implements OnInit, OnDestroy {
   }
 
   openDialog(id: string): void {
+    this.userService.userIdChanged.next(id);
     this.userService.getUser(id).subscribe((user: User) => {
       this.user = user;
 

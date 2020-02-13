@@ -1,5 +1,6 @@
+import { Subscription } from 'rxjs';
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { FormGroup, FormControl, Validators, FormGroupDirective } from '@angular/forms';
 import { MatSelectChange } from '@angular/material/select';
 
 import * as areaCode from '../../data/areaCode.json';
@@ -17,21 +18,26 @@ export class FormComponent implements OnInit {
   @Output() selectionChange: EventEmitter<MatSelectChange>;
   @Input() isEdit: boolean;
   @Input() userEdit: any;
+
+  subscription: Subscription;
+  userId: string;
   areaCodeData: any;
   countryCodeData: any;
   info: any;
 
   regForm: FormGroup;
   filteredArea: any;
-  submitted = false;
   areaEdit: string;
+  submitted = false;
 
   constructor(
     private userService: UserService,
   ) { }
 
   ngOnInit() {
-
+    this.subscription = this.userService.userIdChanged.subscribe((id: string) => {
+      this.userId = id;
+    });
     // data get from JSON
     this.areaCodeData = (areaCode as any).default;
     this.countryCodeData = (countryCode as any).default;
@@ -66,10 +72,9 @@ export class FormComponent implements OnInit {
   changeCountry(e) {
     const id = e.value;
     this.filteredArea = this.areaCodeData.find(el => el.id === id);
-    console.log(this.filteredArea);
   }
 
-  onSubmit() {
+  onSubmit(formDirective: FormGroupDirective) {
     this.submitted = true;
 
     let fullName: string;
@@ -90,6 +95,9 @@ export class FormComponent implements OnInit {
         this.userService.getUsers();
       });
     }
+    alert(`Saved!!`);
+    formDirective.resetForm();
+    this.regForm.reset();
   }
 
   forbiddenGender(control: FormControl) {
@@ -141,7 +149,7 @@ export class FormComponent implements OnInit {
       middleName: arrName[1],
       firstName: arrName[2],
       areaEdit: areaC,
-      numberPhone: nbPhone,
+      numberPhone: nbPhone.slice(areaC.length),
       gender
     });
   }
@@ -165,7 +173,22 @@ export class FormComponent implements OnInit {
     return this.countryCodeData.find(el => phoneNumber.includes(el.value));
   }
 
-  get ftAreaValue() {
-    return this.filteredArea.value || [];
+  onEdit(user: any) {
+    const { lastName, middleName, firstName, areaEdit, numberPhone, gender } = user;
+    const id = this.userEdit.id;
+    const userWillSend = {
+      id,
+      fullName: `${lastName} ${middleName} ${firstName}`,
+      nbPhone: areaEdit + numberPhone,
+      gender
+    };
+
+    if (this.regForm.valid) {
+      this.userService.editUser(id, userWillSend).subscribe((userRes: any) => {
+        console.log(`Updated ${userRes.fullName}`);
+        alert(`Updated ${userRes.fullName}`);
+        this.userService.getUsers();
+      });
+    }
   }
 }

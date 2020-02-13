@@ -1,10 +1,11 @@
-<form [formGroup]="regForm" (ngSubmit)="onSubmit()">
+<form [formGroup]="regForm" (ngSubmit)="onSubmit(formDirective)" #formDirective="ngForm" novalidate>
   <div class="d-flex justify-content-center">
     <mat-form-field appearance="fill" class="mr-4">
       <mat-label>Last Name *</mat-label>
       <input matInput formControlName="lastName">
       <!-- validation -->
-      <mat-error *ngIf=" !regForm.get('lastName').valid && regForm.get('lastName').errors['required']">
+      <mat-error
+        *ngIf="!regForm.get('lastName').touched && !regForm.get('lastName').valid && regForm.get('lastName').errors['required']">
         Last name is <strong>required</strong>
       </mat-error>
 
@@ -90,11 +91,12 @@
 
   <div class="mt-4 ml-3" *ngIf="!isEdit">
     <button mat-flat-button color="primary" type="submit">Submit</button>
-    <button mat-flat-button color="accent" class="ml-4" type="button" (click)='setInfo()'>Retrieve My Info</button>
+    <button mat-flat-button color="accent" class="ml-4" type="button" (click)='setInfo()'> Retrieve My Info </button>
   </div>
 
   <div class="mt-4 ml-3" *ngIf="isEdit">
-    <button id="edit-btn" mat-flat-button color="primary" type="button" (click)="onEdit()"> Save </button>
+    <button id="edit-btn" mat-flat-button color="primary" type="button" (click)="onEdit(regForm.value)"
+      mat-dialog-close> Save </button>
     <ng-content></ng-content>
   </div>
 </form>

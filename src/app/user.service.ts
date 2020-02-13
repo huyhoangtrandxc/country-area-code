@@ -9,6 +9,8 @@ import { User } from './user.model';
 })
 export class UserService {
   userChanged = new Subject<User[]>();
+  userIdChanged = new Subject<any>();
+
 
   private users: User[];
 
