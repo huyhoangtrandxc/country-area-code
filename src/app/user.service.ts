@@ -33,4 +33,15 @@ export class UserService {
       id: newId
     });
   }
+
+  editUser(id: string, user: any) {
+    return this.http.put('https://5e4138942001b900146ba398.mockapi.io/users/' + id, {
+      ...user,
+      id
+    });
+  }
+
+  deleteUser(id: string) {
+    return this.http.delete('https://5e4138942001b900146ba398.mockapi.io/users/' + id);
+  }
 }

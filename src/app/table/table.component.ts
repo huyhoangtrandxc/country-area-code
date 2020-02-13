@@ -44,7 +44,14 @@ export class TableComponent implements OnInit, OnDestroy {
         this.user = result;
       });
     });
+  }
 
+  onDelete(id: string) {
+    this.userService.deleteUser(id).subscribe((user: any) => {
+      alert(`Deleted user ${user.fullName}`);
+      console.log(`Deleted user ${user.fullName}`);
+      this.userService.getUsers();
+    });
   }
 
   ngOnDestroy() {
