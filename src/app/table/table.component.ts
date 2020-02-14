@@ -4,6 +4,8 @@ import { User } from './../user.model';
 import { Subscription } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogComponent } from '../dialog/dialog.component';
+import { SnackBarComponent } from '../snack-bar/snack-bar.component';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-table',
@@ -18,7 +20,8 @@ export class TableComponent implements OnInit, OnDestroy {
 
   constructor(
     private userService: UserService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private snackBar: MatSnackBar
   ) { }
 
   ngOnInit() {
@@ -29,7 +32,6 @@ export class TableComponent implements OnInit, OnDestroy {
   }
 
   openDialog(id: string): void {
-    this.userService.userIdChanged.next(id);
     this.userService.getUser(id).subscribe((user: User) => {
       this.user = user;
 
@@ -49,9 +51,21 @@ export class TableComponent implements OnInit, OnDestroy {
 
   onDelete(id: string) {
     this.userService.deleteUser(id).subscribe((user: any) => {
-      alert(`Deleted user ${user.fullName}`);
+      // alert(`Deleted user ${user.fullName}`);
+      this.openSnackBar(`Deleted user ${user.fullName}`);
       console.log(`Deleted user ${user.fullName}`);
       this.userService.getUsers();
+    });
+  }
+
+  openSnackBar(message: string) {
+    this.snackBar.openFromComponent(SnackBarComponent);
+
+    this.snackBar.open(message, 'Done', {
+      duration: 3000,
+      verticalPosition: 'top',
+      horizontalPosition: 'center',
+      panelClass: ['green-snackbar']
     });
   }
 

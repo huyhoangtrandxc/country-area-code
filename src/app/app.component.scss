@@ -1,1 +1,7 @@
+::ng-deep snack-bar-container.green-snackbar {
+  background: rgba(7, 180, 94, 0.993);
 
+  .mat-simple-snackbar-action .mat-button .mat-button-wrapper {
+    color: white;
+  }
+}

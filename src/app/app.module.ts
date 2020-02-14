@@ -18,6 +18,8 @@ import { FormComponent } from './form/form.component';
 import { TableComponent } from './table/table.component';
 import { BlockCopyPasteDirective } from './block-copy-paste.directive';
 import { DialogComponent } from './dialog/dialog.component';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { SnackBarComponent } from './snack-bar/snack-bar.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +27,8 @@ import { DialogComponent } from './dialog/dialog.component';
     FormComponent,
     TableComponent,
     BlockCopyPasteDirective,
-    DialogComponent
+    DialogComponent,
+    SnackBarComponent
   ],
   imports: [
     BrowserModule,
@@ -40,11 +43,12 @@ import { DialogComponent } from './dialog/dialog.component';
     MatButtonModule,
     MatRadioModule,
     MatTableModule,
-    MatDialogModule
+    MatDialogModule,
+    MatSnackBarModule
   ],
   providers: [
   ],
   bootstrap: [AppComponent],
-  entryComponents: [DialogComponent]
+  entryComponents: [DialogComponent, SnackBarComponent]
 })
 export class AppModule { }

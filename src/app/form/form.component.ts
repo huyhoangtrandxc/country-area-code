@@ -1,7 +1,9 @@
+import { SnackBarComponent } from './../snack-bar/snack-bar.component';
 import { Subscription } from 'rxjs';
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { FormGroup, FormControl, Validators, FormGroupDirective } from '@angular/forms';
 import { MatSelectChange } from '@angular/material/select';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 import * as areaCode from '../../data/areaCode.json';
 import * as countryCode from '../../data/countryCode.json';
@@ -32,12 +34,10 @@ export class FormComponent implements OnInit {
 
   constructor(
     private userService: UserService,
+    private snackBar: MatSnackBar
   ) { }
 
   ngOnInit() {
-    this.subscription = this.userService.userIdChanged.subscribe((id: string) => {
-      this.userId = id;
-    });
     // data get from JSON
     this.areaCodeData = (areaCode as any).default;
     this.countryCodeData = (countryCode as any).default;
@@ -69,6 +69,17 @@ export class FormComponent implements OnInit {
     }
   }
 
+  openSnackBar(message: string) {
+    this.snackBar.openFromComponent(SnackBarComponent);
+
+    this.snackBar.open(message, 'Done', {
+      duration: 3000,
+      verticalPosition: 'top',
+      horizontalPosition: 'center',
+      panelClass: ['green-snackbar']
+    });
+  }
+
   changeCountry(e) {
     const id = e.value;
     this.filteredArea = this.areaCodeData.find(el => el.id === id);
@@ -91,13 +102,15 @@ export class FormComponent implements OnInit {
 
     if (this.regForm.valid) {
       this.userService.addUser(user).subscribe((userRes: User) => {
-        console.log(`Added user ${userRes.fullName}!`);
+        this.openSnackBar(`Added User ${userRes.fullName}!`);
+        console.log(`Added User ${userRes.fullName}!`);
         this.userService.getUsers();
+
+        // alert(`Saved!!`);
+        formDirective.resetForm();
+        this.regForm.reset();
       });
     }
-    alert(`Saved!!`);
-    formDirective.resetForm();
-    this.regForm.reset();
   }
 
   forbiddenGender(control: FormControl) {
