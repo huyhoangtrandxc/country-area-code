@@ -53,7 +53,6 @@ export class TableComponent implements OnInit, OnDestroy {
     this.userService.deleteUser(id).subscribe((user: any) => {
       // alert(`Deleted user ${user.fullName}`);
       this.openSnackBar(`Deleted user ${user.fullName}`);
-      console.log(`Deleted user ${user.fullName}`);
       this.userService.getUsers();
     });
   }

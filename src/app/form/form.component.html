@@ -4,12 +4,12 @@
       <mat-label>Last Name *</mat-label>
       <input matInput formControlName="lastName">
       <!-- validation -->
-      <mat-error
-        *ngIf="!regForm.get('lastName').touched && !regForm.get('lastName').valid && regForm.get('lastName').errors['required']">
+      <mat-error *ngIf="!regForm.get('lastName').valid && regForm.get('lastName').errors['required']">
         Last name is <strong>required</strong>
       </mat-error>
 
-      <mat-error *ngIf=" !regForm.get('lastName').valid 
+      <mat-error *ngIf="!regForm.get('lastName').valid 
+    
       && (regForm.get('lastName').errors['pattern'] || regForm.get('lastName').errors['hasNumber'])">
         Last name only accept <strong>string</strong>
       </mat-error>
@@ -28,11 +28,14 @@
       <mat-label>First Name *</mat-label>
       <input matInput formControlName="firstName">
 
-      <mat-error *ngIf="!regForm.get('firstName').valid && regForm.get('firstName').errors['required']">
+      <mat-error *ngIf="!regForm.get('firstName').valid 
+      && regForm.get('firstName').touched 
+      && regForm.get('firstName').errors['required']">
         First name is <strong>required</strong>
       </mat-error>
 
       <mat-error *ngIf=" !regForm.get('firstName').valid 
+      && regForm.get('firstName').touched 
       && (regForm.get('firstName').errors['pattern'] || regForm.get('firstName').errors['hasNumber'])">
         Last name only accepts <strong>string</strong>
       </mat-error>
@@ -44,7 +47,7 @@
     <mat-form-field class="mr-5" *ngIf="!isEdit">
       <mat-label>Country Code</mat-label>
       <mat-select matNativeControl formControlName="country" (selectionChange)="changeCountry($event)">
-        <mat-option *ngFor="let country of countryCodeData" [value]="country.id">
+        <mat-option *ngFor="let country of countryCodeData" [value]="{ id: country.id, value: country.value}">
           {{ country.value }}
         </mat-option>
       </mat-select>
@@ -57,6 +60,7 @@
           {{area}}
         </mat-option>
       </mat-select>
+      <mat-hint *ngIf="showHint">Choose Country Code before!</mat-hint>
     </mat-form-field>
 
     <mat-form-field class="mr-5" *ngIf="isEdit">
@@ -70,9 +74,34 @@
 
     <mat-form-field appearance="legacy" class="mr-5">
       <mat-label>Number phone</mat-label>
-      <input appBlockCopyPaste matInput placeholder="Number phone" formControlName="numberPhone">
-      <mat-error *ngIf="!regForm.get('numberPhone').valid && regForm.get('numberPhone').errors['pattern']">
+      <input appBlockCopyPaste matInput placeholder="Number phone" formControlName="numberPhone"
+        maxlength="{{maxLength}}">
+
+      <mat-error *ngIf="
+        !regForm.get('numberPhone').valid 
+        && regForm.get('numberPhone').touched 
+        && regForm.get('numberPhone').errors['pattern']">
         Number phone only accept <strong>number</strong>
+      </mat-error>
+      <mat-error *ngIf="
+        !regForm.get('numberPhone').valid 
+        && regForm.get('numberPhone').touched 
+        && regForm.get('numberPhone').errors['pattern']">
+        Number phone only accept <strong>number</strong>
+      </mat-error>
+      <mat-error *ngIf="
+        !regForm.get('numberPhone').valid 
+        && regForm.get('numberPhone').touched 
+        && !regForm.get('numberPhone').errors['pattern']
+        && regForm.get('numberPhone').errors['minlength']">
+        Number phone can be min <strong>{{ minLength }}</strong> number
+      </mat-error>
+      <mat-error *ngIf="
+        !regForm.get('numberPhone').valid 
+        && regForm.get('numberPhone').touched 
+        && !regForm.get('numberPhone').errors['pattern']
+        && regForm.get('numberPhone').errors['maxlength']">
+        Number phone can be max <strong>{{ maxLength }}</strong> number
       </mat-error>
     </mat-form-field>
   </div>

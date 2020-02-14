@@ -9,7 +9,6 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 })
 export class DialogComponent implements OnInit {
   userData: any;
-  userId: string;
 
   constructor(
     public dialogRef: MatDialogRef<DialogComponent>,
@@ -23,5 +22,4 @@ export class DialogComponent implements OnInit {
   onNoClick(): void {
     this.dialogRef.close();
   }
-
 }

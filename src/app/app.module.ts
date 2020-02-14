@@ -28,7 +28,7 @@ import { SnackBarComponent } from './snack-bar/snack-bar.component';
     TableComponent,
     BlockCopyPasteDirective,
     DialogComponent,
-    SnackBarComponent
+    SnackBarComponent,
   ],
   imports: [
     BrowserModule,

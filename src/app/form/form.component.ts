@@ -20,16 +20,17 @@ export class FormComponent implements OnInit {
   @Output() selectionChange: EventEmitter<MatSelectChange>;
   @Input() isEdit: boolean;
   @Input() userEdit: any;
-
   subscription: Subscription;
   userId: string;
   areaCodeData: any;
   countryCodeData: any;
   info: any;
-
   regForm: FormGroup;
   filteredArea: any;
   areaEdit: string;
+  minLength: number;
+  maxLength: number;
+  showHint = true;
   submitted = false;
 
   constructor(
@@ -58,15 +59,16 @@ export class FormComponent implements OnInit {
       ]),
 
       country: new FormControl(null),
-      area: new FormControl(null),
+      area: new FormControl({ value: null, disabled: true }),
       areaEdit: new FormControl(null),
-      numberPhone: new FormControl('', [Validators.pattern(/^(\(?\+?[0-9]*\)?)?[0-9_\- \(\)]*$/)]),
+      numberPhone: new FormControl(null, [Validators.pattern(/^(\(?\+?[0-9]*\)?)?[0-9_\- \(\)]*$/)]),
       gender: new FormControl('U', [this.forbiddenGender])
     });
 
     if (this.userEdit && this.isEdit) {
       this.setInfoEdit(this.userEdit);
     }
+    // this.regForm.get('firstName').disable();
   }
 
   openSnackBar(message: string) {
@@ -81,8 +83,24 @@ export class FormComponent implements OnInit {
   }
 
   changeCountry(e) {
-    const id = e.value;
+    const id = e.value.id;
+    const value = e.value.value;
+
     this.filteredArea = this.areaCodeData.find(el => el.id === id);
+    this.showHint = false;
+    this.regForm.get('area').enable();
+    if (value === '+84') {
+      this.setMinMaxLengthValidator('numberPhone', 10, 10, [Validators.pattern(/^(\(?\+?[0-9]*\)?)?[0-9_\- \(\)]*$/)]);
+    } else {
+      this.setMinMaxLengthValidator('numberPhone', 10, 20, [Validators.pattern(/^(\(?\+?[0-9]*\)?)?[0-9_\- \(\)]*$/)]);
+    }
+  }
+
+  setMinMaxLengthValidator = (fieldName: string, minL: number, maxL: number, anotherValidator: any[] = []) => {
+    this.minLength = minL;
+    this.maxLength = maxL;
+    this.regForm.get(fieldName)
+      .setValidators([Validators.minLength(minL), Validators.maxLength(maxL), ...anotherValidator]);
   }
 
   onSubmit(formDirective: FormGroupDirective) {
@@ -103,10 +121,7 @@ export class FormComponent implements OnInit {
     if (this.regForm.valid) {
       this.userService.addUser(user).subscribe((userRes: User) => {
         this.openSnackBar(`Added User ${userRes.fullName}!`);
-        console.log(`Added User ${userRes.fullName}!`);
         this.userService.getUsers();
-
-        // alert(`Saved!!`);
         formDirective.resetForm();
         this.regForm.reset();
       });
@@ -130,17 +145,19 @@ export class FormComponent implements OnInit {
   }
 
   setInfo() {
-    const { fullName, lastName, middleName, phoneNumber, gender } = this.info;
+    const { fullName, lastName, phoneNumber, gender } = this.info;
 
     const country = this.getCountry(phoneNumber);
     const firstName = fullName.split(' ').reverse()[0];
     const areaC = this.getAreaCode(country, phoneNumber);
     const numberPhoneOnly = this.getShortNbPhone(country, areaC, phoneNumber);
 
+    this.showHint = false;
+    this.regForm.get('area').enable();
     this.filteredArea = this.areaCodeData.find(el => el.id === country.id);
     this.regForm.patchValue({
       lastName,
-      middleName,
+      middleName: '',
       firstName,
       country: country.id,
       area: areaC,
@@ -155,7 +172,6 @@ export class FormComponent implements OnInit {
     const { fullName, nbPhone, gender } = user;
     const arrName = fullName.split(' ');
     const areaC = this.filteredArea.value.find(el => nbPhone.indexOf(el) === 0);
-    this.areaEdit = '13321';
 
     this.regForm.patchValue({
       lastName: arrName[0],
@@ -198,8 +214,7 @@ export class FormComponent implements OnInit {
 
     if (this.regForm.valid) {
       this.userService.editUser(id, userWillSend).subscribe((userRes: any) => {
-        console.log(`Updated ${userRes.fullName}`);
-        alert(`Updated ${userRes.fullName}`);
+        this.openSnackBar(`Updated ${userRes.fullName}`);
         this.userService.getUsers();
       });
     }
