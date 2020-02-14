@@ -11,6 +11,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatTableModule } from '@angular/material/table';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -20,6 +22,7 @@ import { BlockCopyPasteDirective } from './block-copy-paste.directive';
 import { DialogComponent } from './dialog/dialog.component';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { SnackBarComponent } from './snack-bar/snack-bar.component';
+import { SpinnerComponent } from './spinner/spinner.component';
 
 @NgModule({
   declarations: [
@@ -29,6 +32,7 @@ import { SnackBarComponent } from './snack-bar/snack-bar.component';
     BlockCopyPasteDirective,
     DialogComponent,
     SnackBarComponent,
+    SpinnerComponent,
   ],
   imports: [
     BrowserModule,
@@ -44,7 +48,8 @@ import { SnackBarComponent } from './snack-bar/snack-bar.component';
     MatRadioModule,
     MatTableModule,
     MatDialogModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatProgressSpinnerModule
   ],
   providers: [
   ],

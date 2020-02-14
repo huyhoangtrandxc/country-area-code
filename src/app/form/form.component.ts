@@ -28,10 +28,13 @@ export class FormComponent implements OnInit {
   regForm: FormGroup;
   filteredArea: any;
   areaEdit: string;
-  minLength: number;
-  maxLength: number;
+  minLength = 6;
+  maxLength = 10;
+  closePopup = false;
+  loading = false;
   showHint = true;
   submitted = false;
+  formDirective: any;
 
   constructor(
     private userService: UserService,
@@ -51,24 +54,30 @@ export class FormComponent implements OnInit {
         Validators.pattern(/^[^*|:<>[\]{}.,?/`~¥£€\\';@&$!#%^*+=()”]+$/),
         this.forbiddenNotAllowedNumber
       ]),
-      middleName: new FormControl('', [Validators.pattern(/^[^*|:<>[\]{}.,?/`~¥£€\\';@&$!#%^*+=()”]+$/)]),
+      middleName: new FormControl('', [
+        Validators.pattern(/^[^*|:<>[\]{}.,?/`~¥£€\\';@&$!#%^*+=()”]+$/)
+      ]),
       firstName: new FormControl(null, [
         Validators.required,
         Validators.pattern(/^[^*|:<>[\]{}.,?/`~¥£€\\';@&$!#%^*+=()”]+$/),
         this.forbiddenNotAllowedNumber
       ]),
 
-      country: new FormControl(null),
+      country: new FormControl(null, [Validators.required]),
       area: new FormControl({ value: null, disabled: true }),
       areaEdit: new FormControl(null),
-      numberPhone: new FormControl(null, [Validators.pattern(/^(\(?\+?[0-9]*\)?)?[0-9_\- \(\)]*$/)]),
+      numberPhone: new FormControl(null, [
+        Validators.required,
+        Validators.minLength(6),
+        Validators.maxLength(10),
+        Validators.pattern(/^(\(?\+?[0-9]*\)?)?[0-9_\- \(\)]*$/)
+      ]),
       gender: new FormControl('U', [this.forbiddenGender])
     });
 
     if (this.userEdit && this.isEdit) {
       this.setInfoEdit(this.userEdit);
     }
-    // this.regForm.get('firstName').disable();
   }
 
   openSnackBar(message: string) {
@@ -83,31 +92,33 @@ export class FormComponent implements OnInit {
   }
 
   changeCountry(e) {
-    const id = e.value.id;
-    const value = e.value.value;
+    const id = e.value;
+    const value = this.countryCodeData.find(el => el.id === id).value;
 
     this.filteredArea = this.areaCodeData.find(el => el.id === id);
     this.showHint = false;
     this.regForm.get('area').enable();
     if (value === '+84') {
-      this.setMinMaxLengthValidator('numberPhone', 10, 10, [Validators.pattern(/^(\(?\+?[0-9]*\)?)?[0-9_\- \(\)]*$/)]);
+      this.setMinMaxLengthValidator('numberPhone', 6, 10, [Validators.pattern(/^(\(?\+?[0-9]*\)?)?[0-9_\- \(\)]*$/)]);
     } else {
-      this.setMinMaxLengthValidator('numberPhone', 10, 20, [Validators.pattern(/^(\(?\+?[0-9]*\)?)?[0-9_\- \(\)]*$/)]);
+      this.setMinMaxLengthValidator('numberPhone', 6, 20, [Validators.pattern(/^(\(?\+?[0-9]*\)?)?[0-9_\- \(\)]*$/)]);
     }
   }
+
 
   setMinMaxLengthValidator = (fieldName: string, minL: number, maxL: number, anotherValidator: any[] = []) => {
     this.minLength = minL;
     this.maxLength = maxL;
     this.regForm.get(fieldName)
-      .setValidators([Validators.minLength(minL), Validators.maxLength(maxL), ...anotherValidator]);
+      .setValidators([Validators.required, Validators.minLength(minL), Validators.maxLength(maxL), ...anotherValidator]);
   }
 
   onSubmit(formDirective: FormGroupDirective) {
+    this.formDirective = formDirective;
     this.submitted = true;
-
+    this.loading = true;
     let fullName: string;
-    const { lastName, middleName, firstName, area, numberPhone, gender } = this.regForm.value;
+    const { lastName, middleName, firstName, country, area, numberPhone, gender } = this.regForm.value;
     const nbPhone: string = area + numberPhone;
     if (lastName && firstName) {
       fullName = `${lastName.trim()} ${middleName.trim()} ${firstName.trim()}`;
@@ -115,11 +126,13 @@ export class FormComponent implements OnInit {
     const user = {
       fullName,
       nbPhone,
-      gender
+      gender,
+      country
     };
 
     if (this.regForm.valid) {
       this.userService.addUser(user).subscribe((userRes: User) => {
+        this.loading = false;
         this.openSnackBar(`Added User ${userRes.fullName}!`);
         this.userService.getUsers();
         formDirective.resetForm();
@@ -146,12 +159,13 @@ export class FormComponent implements OnInit {
 
   setInfo() {
     const { fullName, lastName, phoneNumber, gender } = this.info;
-
     const country = this.getCountry(phoneNumber);
     const firstName = fullName.split(' ').reverse()[0];
     const areaC = this.getAreaCode(country, phoneNumber);
     const numberPhoneOnly = this.getShortNbPhone(country, areaC, phoneNumber);
 
+    // formDirective.resetForm();
+    // this.regForm.reset();
     this.showHint = false;
     this.regForm.get('area').enable();
     this.filteredArea = this.areaCodeData.find(el => el.id === country.id);
@@ -168,15 +182,21 @@ export class FormComponent implements OnInit {
 
   setInfoEdit(user: any) {
     this.filteredArea = this.areaCodeData.find(el => el.id === 1);
-
-    const { fullName, nbPhone, gender } = user;
+    const { fullName, nbPhone, gender, country } = user;
+    const value = this.countryCodeData.find(el => el.id === country).value;
     const arrName = fullName.split(' ');
     const areaC = this.filteredArea.value.find(el => nbPhone.indexOf(el) === 0);
 
+    if (value === '+84') {
+      this.setMinMaxLengthValidator('numberPhone', 6, 10, [Validators.pattern(/^(\(?\+?[0-9]*\)?)?[0-9_\- \(\)]*$/)]);
+    } else {
+      this.setMinMaxLengthValidator('numberPhone', 6, 20, [Validators.pattern(/^(\(?\+?[0-9]*\)?)?[0-9_\- \(\)]*$/)]);
+    }
     this.regForm.patchValue({
       lastName: arrName[0],
       middleName: arrName[1],
       firstName: arrName[2],
+      country,
       areaEdit: areaC,
       numberPhone: nbPhone.slice(areaC.length),
       gender
@@ -212,10 +232,14 @@ export class FormComponent implements OnInit {
       gender
     };
 
-    if (this.regForm.valid) {
+    if (this.regForm.get('lastName').valid
+      && this.regForm.get('firstName').valid
+      && this.regForm.get('numberPhone').valid
+    ) {
       this.userService.editUser(id, userWillSend).subscribe((userRes: any) => {
         this.openSnackBar(`Updated ${userRes.fullName}`);
         this.userService.getUsers();
+        // this.closePopup = true;
       });
     }
   }
